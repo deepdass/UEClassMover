@@ -386,6 +386,7 @@ def move_class(source, proj_name, name):
     preview_includes(source, proj_name, name, inc_paths[name + ".h"], entries, index)
 
     confirm = input("Confirm? (y/n): ").strip().lower()
+
     if confirm != "y":
         print("  Skipped.")
         return
@@ -442,14 +443,21 @@ def run():
         source_input = os.getcwd()
     source_input = source_input.rstrip("\\/")
 
-    parts = source_input.replace("\\", "/").split("/")
+    parts = [p for p in source_input.replace("\\", "/").split("/") if p]
 
-    if parts[-1].lower() == "source":
-        proj_name = parts[-2] if len(parts) >= 2 else parts[-1]
+    if len(parts) >= 2 and parts[-2].lower() == "source":
+        proj_name = parts[-1]
+        source = source_input
+    elif parts and parts[-1].lower() == "source":
+        proj_name = parts[-2] if len(parts) >= 2 else ""
         source = os.path.join(source_input, proj_name)
     else:
-        proj_name = parts[-1]
+        proj_name = parts[-1] if parts else ""
         source = os.path.join(source_input, "Source", proj_name)
+
+    if not proj_name:
+        print("Could not determine project name from path.")
+        return
 
     if not os.path.exists(source):
         print(f"Path not found: {source}")
@@ -467,6 +475,9 @@ def run():
         return
 
     classes = [c.strip() for c in raw.split(",") if c.strip()]
+    if not classes:
+        print("No classes entered. Exiting.")
+        return
     for name in classes:
         move_class(source, proj_name, name)
 
