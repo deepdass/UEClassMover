@@ -172,14 +172,10 @@ def update_includes(source, name, new_include_path):
                         continue
 
                     if new_inc in seen_incs:
-                        print(f"  Removed duplicate in {f}: {current_inc}")
                         changed = True
                     else:
                         new_lines.append(line.replace(current_inc, new_inc))
                         seen_incs.add(new_inc)
-                        print(f"  Updated in {f}:")
-                        print(f"    - {current_inc}")
-                        print(f"    + {new_inc}")
                         changed = True
 
                 if changed:
@@ -222,16 +218,12 @@ def update_self_includes(source, dest_path, index):
             new_inc    = f'#include "{correct_inc_path}"'
 
             if new_inc in seen_incs:
-                print(f"  Removed duplicate in {os.path.basename(dest_path)}: #include \"{inc_path}\"")
                 changed = True
                 continue
 
             seen_incs.add(new_inc)
 
             if new_line != line:
-                print(f"  Updated in {os.path.basename(dest_path)}:")
-                print(f"    - {line.strip()}")
-                print(f"    + {new_line.strip()}")
                 changed = True
 
             new_lines.append(new_line)
@@ -299,14 +291,14 @@ def preview_includes(source, proj_name, name, h_inc_path, entries, index):
             print(f"  WARNING: Could not preview self-includes in {filename}: {e}")
 
     if changes:
-        print("  Include changes:")
+        print("Include changes:")
         for (filepath, old, new) in changes:
-            print(f"    {filepath}")
-            print(f"      - {old}")
+            print(f"  {filepath}")
+            print(f"    - {old}")
             if new:
-                print(f"      + {new}")
+                print(f"    + {new}")
             else:
-                print(f"      (duplicate removed)")
+                print(f"    (duplicate removed)")
         print()
 
 # path building / display
@@ -333,7 +325,7 @@ def build_paths(source, name, subfolder, preset):
 def pretty(source, proj_name, label, dest_dir, filename):
     full    = os.path.join(dest_dir, filename)
     display = full.replace(os.path.normpath(source), os.path.join("Source", proj_name))
-    print(f"  {label}  {display}")
+    print(f"  {label} -> {display}")
 
 
 # main move logic
@@ -378,8 +370,6 @@ def move_class(source, proj_name, name):
     print()
     for (filename, dest_dir, label) in entries:
         pretty(source, proj_name, label, dest_dir, filename)
-        if filename.endswith(".h"):
-            print(f"    include → \"{inc_paths[filename]}\"")
     print()
 
     index = build_index(source)
